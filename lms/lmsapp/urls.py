@@ -29,6 +29,6 @@ urlpatterns = [
     path('assignment/list/', AssignmentListCreateView.as_view(), name='course_list'),
     path('assignment/update/<int:pk>/', AssignmentUpdateDeleteView.as_view(), name='course_details'),
     
-    path('assignment/list/', SubmissionListCreateView.as_view(), name='course_list'),
-    path('assignment/update/<int:pk>/', SubmissionUpdateDeleteView.as_view(), name='course_details'),
+    path('submission/list/', SubmissionListCreateView.as_view(), name='course_list'),
+    path('submission/update/<int:pk>/', SubmissionUpdateDeleteView.as_view(), name='course_details'),
 ] 
