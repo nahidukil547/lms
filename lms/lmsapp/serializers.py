@@ -11,6 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name']
+
+    def validate_username(self, value):
+        user = self.instance 
+        if User.objects.exclude(pk=user.pk if user else None).filter(username=value).exists():
+            raise serializers.ValidationError("A user with that username already exists.")
+        return value
+    
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = User(**validated_data)
@@ -84,37 +91,37 @@ class LoginSerializer(serializers.Serializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model=Course
-        fields=['__all__']
+        fields='__all__'
 
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model=Module
-        fields=['__all__']
+        fields='__all__'
 
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model=Lesson
-        fields=['__all__']
+        fields='__all__'
 
 class RecodedVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model=RecodedVideo
-        fields=['__all__']
+        fields='__all__'
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model=Enrollment
-        fields=['__all__']
+        fields='__all__'
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model=Assignment
-        fields=['__all__']
+        fields='__all__'
 
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model=Submission
-        fields=['__all__']
+        fields='__all__'

@@ -3,13 +3,14 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import (RegisterSerializer, LoginSerializer,CourseSerializer,ModuleSerializer,
+                          LessonSerializer,RecodedVideoSerializer,EnrollmentSerializer,AssignmentSerializer,SubmissionSerializer )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-from .models import UserProfile
+from .models import UserProfile,Course,Module, Lesson, RecodedVideo, Enrollment, Assignment,Submission
 from django.contrib.auth.models import User
-
+from .permission import IsEmployee
 # Create your views here.
 
 # User = get_user_model()
@@ -73,5 +74,42 @@ class LogOutView(APIView):
         except TokenError:
             return Response({"error": "Token is invalid or already blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class CourseCreateListView(generics.ListCreateAPIView):
+    queryset= Course.objects.all()
+    serializer_class=CourseSerializer
+    
+    def get_permissions(self):
+        if self.request.method=="GET":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsEmployee()]
+
+class CourseUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Course.objects.all()
+    serializer_class= CourseSerializer
+
+    def get_permissions(self):
+        if self.request.method=="GET":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsEmployee()]
+
+class ModuleCreateListView(generics.ListCreateAPIView):
+    queryset = Module.objects.all()
+    serializer_class=ModuleSerializer
+
+    # def get_permissions(self):
+    #     if self.request.method=="GET":
+    #         return [AllowAny()]
+    #     return [IsAuthenticated(), IsEmployee()]
+    
+
+class ModuleUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Module.objects.all()
+    serializer_class= ModuleSerializer
+
+    def get_permissions(self):
+        if self.request.method=="GET":
+            return [AllowAny()]
+        return [IsAuthenticated(), IsEmployee()]
 
 

@@ -3,6 +3,8 @@ from django.contrib.auth.models import AbstractUser
 import uuid
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.auth.models import User
+from django.utils.text import slugify
+import itertools
 # Create your models here.
 
 class UserProfile(models.Model):
@@ -37,6 +39,7 @@ class Course(models.Model):
         )
     
     title = models.CharField(max_length=255)
+    slug=models.SlugField(max_length=255, unique=True, blank=True,  null=True)
     description = models.TextField(blank=True, null=True)
     thumbnail = models.ImageField(upload_to="course/thumbnails/", blank=True, null=True)
     code = models.CharField(max_length=20, unique=True) 
@@ -52,7 +55,16 @@ class Course(models.Model):
     def __str__(self):
         return self.title
     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = itertools.count(1)
 
+            while type(self).objects.filter(slug=slug).exists(): #type(self)ai class .object.filter('ai class theke filter korbe')
+                slug = f"{base_slug}-{next(counter)}"
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
@@ -91,7 +103,7 @@ class Lesson(models.Model):
 class RecodedVideo(models.Model):
     title = models.CharField(max_length=255)
     video = models.FileField(null=True,blank=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_videos')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_videos',null=True,blank=True)
     module= models.ForeignKey(Module, on_delete=models.CASCADE, related_name='video_lesson')
     created_at = models.DateTimeField(auto_now_add=True) 
     updated_at = models.DateTimeField(auto_now=True)
