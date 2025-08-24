@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import UserProfile,Course,Module, Lesson, RecodedVideo, Enrollment, Assignment,Submission
 from django.contrib.auth.models import User
-from .permission import IsEmployee
+from .permission import IsEmployee, PermissionMixin
 # Create your views here.
 
 # User = get_user_model()
@@ -58,7 +58,8 @@ class LoginView(APIView):
             'messages':'Login Successfully',
             'tokens': tokens,
             "username":user.username,
-            "email":user.email
+            "email":user.email,
+            "role":user_profile.role
         })
 
 class LogOutView(APIView):
@@ -75,41 +76,70 @@ class LogOutView(APIView):
             return Response({"error": "Token is invalid or already blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CourseCreateListView(generics.ListCreateAPIView):
-    queryset= Course.objects.all()
-    serializer_class=CourseSerializer
-    
-    def get_permissions(self):
-        if self.request.method=="GET":
-            return [AllowAny()]
-        return [IsAuthenticated(), IsEmployee()]
+class CourseCreateListView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
 
-class CourseUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+
+class CourseUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Course.objects.all()
     serializer_class= CourseSerializer
 
-    def get_permissions(self):
-        if self.request.method=="GET":
-            return [AllowAny()]
-        return [IsAuthenticated(), IsEmployee()]
 
-class ModuleCreateListView(generics.ListCreateAPIView):
+class ModuleCreateListView(PermissionMixin, generics.ListCreateAPIView):
     queryset = Module.objects.all()
     serializer_class=ModuleSerializer
 
-    # def get_permissions(self):
-    #     if self.request.method=="GET":
-    #         return [AllowAny()]
-    #     return [IsAuthenticated(), IsEmployee()]
     
 
-class ModuleUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+class ModuleUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Module.objects.all()
     serializer_class= ModuleSerializer
 
-    def get_permissions(self):
-        if self.request.method=="GET":
-            return [AllowAny()]
-        return [IsAuthenticated(), IsEmployee()]
 
 
+class LessonCreateListView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class=LessonSerializer
+
+
+class LessonUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class= LessonSerializer
+
+class RecodedVideoListCreateView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = RecodedVideo.objects.all()
+    serializer_class=RecodedVideoSerializer
+
+
+class RecodedVideoUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = RecodedVideo.objects.all()
+    serializer_class= RecodedVideoSerializer
+
+
+class EnrollmentListCreateView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = Enrollment.objects.all()
+    serializer_class=EnrollmentSerializer
+
+
+class EnrollmentUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Enrollment.objects.all()
+    serializer_class= EnrollmentSerializer
+
+
+class AssignmentListCreateView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class=AssignmentSerializer
+
+
+class AssignmentUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class= AssignmentSerializer
+
+class SubmissionListCreateView(PermissionMixin, generics.ListCreateAPIView):
+    queryset = Assignment.objects.all()
+    serializer_class=AssignmentSerializer
+
+class SubmissionUpdateDeleteView(PermissionMixin, generics.RetrieveUpdateDestroyAPIView):
+    queryset = Submission.objects.all()
+    serializer_class= SubmissionSerializer

@@ -14,7 +14,7 @@ class UserProfile(models.Model):
         ('employee', 'Employee'),
         ('admin', 'Admin'),  
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE,)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,related_name='user_profile')
     phone = models.CharField(max_length=20, unique=True)
     avatar = models.URLField(blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
@@ -28,7 +28,7 @@ class UserProfile(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.username} - {self.role}"
+        return f"{self.user.username} - {self.role}"
 
 
 class Course(models.Model):
