@@ -53,6 +53,7 @@ class Course(models.Model):
         return self.title
     
 
+
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=255)
@@ -74,6 +75,7 @@ class Module(models.Model):
 
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
+    teachers = models.ManyToManyField(UserProfile,related_name="lessons_taught", limit_choices_to={'role': 'teacher'},blank=True)
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True)
@@ -85,6 +87,17 @@ class Lesson(models.Model):
 
     class Meta:
         ordering = ['position']
+
+class RecodedVideo(models.Model):
+    title = models.CharField(max_length=255)
+    video = models.FileField(null=True,blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_videos')
+    module= models.ForeignKey(Module, on_delete=models.CASCADE, related_name='video_lesson')
+    created_at = models.DateTimeField(auto_now_add=True) 
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
 
 class Enrollment(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='enrollments')

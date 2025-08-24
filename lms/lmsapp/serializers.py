@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UserProfile,Course
+from .models import UserProfile,Course,Module,Lesson,RecodedVideo,Enrollment,Assignment, Submission
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User 
@@ -11,13 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name']
-
-    def validate_username(self, value):
-        user = self.instance 
-        if User.objects.exclude(pk=user.pk if user else None).filter(username=value).exists():
-            raise serializers.ValidationError("A user with that username already exists.")
-        return value
-    
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         user = User(**validated_data)
@@ -36,27 +29,6 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-    # def update(self, instance, validated_data):
-    #     # Extract nested user data
-    #     user_data = validated_data.pop('user', None)
-
-    #     if user_data:
-    #         # ✅ Pass the existing user instance and partial=True
-    #         user_serializer = UserSerializer(
-    #             instance=instance.user,  # existing User instance
-    #             data=user_data,
-    #             partial=True
-    #         )
-    #         user_serializer.is_valid(raise_exception=True)
-    #         user_serializer.save()
-
-    #     # Update remaining UserProfile fields
-    #     for attr, value in validated_data.items():
-    #         setattr(instance, attr, value)
-
-    #     instance.save()
-    #     return instance
-
 class RegisterSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
@@ -72,7 +44,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user_data = validated_data.pop('user')
         email = user_data.get('email')
         new_role = validated_data.get('role')
-        print ('in create view')
         try:
             exiting_user= User.objects.get(email=email)
             try:
@@ -109,3 +80,41 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, write_only=True)
     password=serializers.CharField(required=True)
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Course
+        fields=['__all__']
+
+class ModuleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Module
+        fields=['__all__']
+
+
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Lesson
+        fields=['__all__']
+
+class RecodedVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=RecodedVideo
+        fields=['__all__']
+
+
+class EnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Enrollment
+        fields=['__all__']
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Assignment
+        fields=['__all__']
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Submission
+        fields=['__all__']
